@@ -1,26 +1,39 @@
 const axios = require('axios');
+require('dotenv').config();
 
-// Function to get feedback from Gemini API
-async function fetchFeedbackFromGeminiAPI(code) {
-  const apiUrl = 'https://gemini-api-endpoint.com/analyze';  // Replace with the actual Gemini API endpoint
-  
-  const requestBody = {
-    code: code,
-    prompt: "Analyze the following code and provide feedback in the following format:\n1. Time complexity\n2. Space complexity\n3. List the drawbacks in the code in 3 bullet points\n4. Suggest improvements in the code in 2-3 bullet points"
-  };
-  
+async function fetchFeedbackFromGeminiAPI(code, language) {
+  const apiKey = AIzaSyDzBdun-CFlwxRaqsAqK4WvOo4taOheZ3Y;
+  if (!apiKey) {
+    throw new Error('Gemini API key not configured');
+  }
+
+  const prompt = `Analyze this ${language} code and provide feedback on:
+1. Time complexity
+2. Space complexity
+3. Code quality and best practices
+4. Potential improvements
+
+Code:
+${code}`;
+
   try {
-    const response = await axios.post(apiUrl, requestBody, {
-      headers: {
-        'Authorization': 'Bearer YOUR_GEMINI_API_KEY',
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateText',
+      {
+        contents: [{ text: prompt }]
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        }
       }
-    });
+    );
 
-    return response.data.feedback;  // Gemini should return the feedback
+    return response.data.candidates[0].content.text;
   } catch (error) {
-    console.error("Error fetching feedback from Gemini API:", error);
-    throw error;
+    console.error("Error fetching feedback:", error);
+    throw new Error('Failed to get code feedback');
   }
 }
 

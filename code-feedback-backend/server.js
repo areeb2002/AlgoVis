@@ -1,54 +1,77 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { executePythonCode } = require('./execution/pythonExec'); // Make sure this file exists
-const { executeJavaScriptCode } = require('./execution/javascriptExec'); // Make sure this file exists
-const { executeCCode } = require('./execution/cExec'); // Make sure this file exists
-const { executeCppCode } = require('./execution/cppExec'); // Make sure this file exists
-const { executeJavaCode } = require('./execution/javaExec'); // Make sure this file exists
-const { fetchFeedbackFromGeminiAPI } = require('./api/geminiAPI'); // Updated function name
-const app = express();
-const PORT = process.env.PORT || 3000;
+const cors = require('cors');
+const { executePythonCode } = require('./execution/pythonExec');
+const { executeJavaScriptCode } = require('./execution/javascriptExec');
+const { executeCCode } = require('./execution/cExec');
+const { executeCppCode } = require('./execution/cppExec');
+const { executeJavaCode } = require('./execution/javaExec');
+const { fetchFeedbackFromGeminiAPI } = require('./api/geminiAPI');
 
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
 app.use(bodyParser.json());
 
-// Endpoint to execute code
+// Add this middleware before your routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something broke!', details: err.message });
+});
+
+// Your existing routes with improved error handling...
 app.post('/execute-code', async (req, res) => {
   const { code, language } = req.body;
+  
+  if (!code || !language) {
+    return res.status(400).json({ 
+      error: 'Missing required fields', 
+      details: 'Both code and language must be provided' 
+    });
+  }
   
   try {
     let output = '';
     
-    if (language === 'python') {
-      output = await executePythonCode(code);
-    } else if (language === 'javascript') {
-      output = await executeJavaScriptCode(code);
-    } else if (language === 'c') {
-      output = await executeCCode(code);
-    } else if (language === 'cpp') {
-      output = await executeCppCode(code);
-    } else if (language === 'java') {
-      output = await executeJavaCode(code);
-    } else {
-      return res.status(400).json({ error: 'Unsupported language' });
+    switch(language.toLowerCase()) {
+      case 'python':
+        output = await executePythonCode(code);
+        break;
+      case 'javascript':
+        output = await executeJavaScriptCode(code);
+        break;
+      case 'c':
+        output = await executeCCode(code);
+        break;
+      case 'cpp':
+        output = await executeCppCode(code);
+        break;
+      case 'java':
+        output = await executeJavaCode(code);
+        break;
+      default:
+        return res.status(400).json({ 
+          error: 'Unsupported language',
+          details: `Language '${language}' is not supported`
+        });
     }
 
-    res.json({ output });
+    res.json({ output: output.trim() });
   } catch (err) {
-    console.error('Error executing code:', err);  // Log the error for debugging
-    res.status(500).json({ error: 'Error executing code', message: err.message });
-  }
-});
-
-// Endpoint to get feedback from Gemini API
-app.post('/get-feedback', async (req, res) => {
-  const { code } = req.body;
-
-  try {
-    const feedback = await fetchFeedbackFromGeminiAPI(code);  // Correct function name
-    res.json({ feedback });
-  } catch (error) {
-    console.error('Error fetching feedback from Gemini API:', error);  // Log the error for debugging
-    res.status(500).json({ error: 'Error fetching feedback from Gemini API', message: error.message });
+    console.error('Error executing code:', err);
+    res.status(500).json({ 
+      error: 'Error executing code', 
+      details: err.message || 'Unknown error occurred'
+    });
   }
 });
 

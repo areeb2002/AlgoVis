@@ -15,6 +15,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "chart.js": "^2.9.4",
+    "concurrently": "^9.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mime": "^1.6.0",
@@ -37,7 +38,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "backend": "cd code-feedback-backend && npm run dev",
+    "dev": "concurrently \"npm start\" \"npm run backend\""
   },
   "eslintConfig": {
     "extends": [
