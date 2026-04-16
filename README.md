@@ -144,7 +144,7 @@ Time Complexity is n^2 because here i used Two itarations .
 
 Deployment Server :- <span> netlify </span>
 
-<a href="https://algo-visualizer-wasim.netlify.app">Click me to See </a>
+<a href="">Click me to See </a>
 
 <!-- ### DEVELOPER
 
@@ -153,7 +153,6 @@ Deployment Server :- <span> netlify </span>
 <tr>
 <td align='center'>
 <img height="130" width="140" src="./Github/Developer/Image/Dev_pro_pic.jpeg" />       <br/>
-<a href="https://github.com/wasim15185"> <Strong>Wasim Akram Biswas </Strong></a>
 </td>
 </tr>
 </tbody>
@@ -161,7 +160,7 @@ Deployment Server :- <span> netlify </span>
 
 ## MIT License
 
-        Copyright (c) 2021 Wasim Akram Biswas
+        Copyright (c) 2021 Mohammad Areeb Hussain
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
