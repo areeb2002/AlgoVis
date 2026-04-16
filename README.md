@@ -160,7 +160,7 @@ Deployment Server :- <span> netlify </span>
 
 ## MIT License
 
-        Copyright (c) 2021 Mohammad Areeb Hussain
+        Copyright (c) 2025 Mohammad Areeb Hussain
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
