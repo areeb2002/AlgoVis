@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import "../css/CodeFeedback.css";
 import axios from "axios";
 
+// Configure axios defaults
+axios.defaults.baseURL = 'http://localhost:5000';
+
 const CodeFeedback = () => {
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("python");
@@ -10,25 +13,44 @@ const CodeFeedback = () => {
 
   const handleRunCode = async () => {
     try {
-      // Sending code execution request to the backend
-      const response = await axios.post("/execute-code", {
-        code,
-        language,
+      const response = await fetch('http://localhost:5000/execute-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code,
+          language,
+        }),
       });
-      setOutput(response.data.output || "No output");
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setOutput(`Error: ${data.details || data.error || 'Unknown error occurred'}`);
+        return;
+      }
+
+      setOutput(data.output || 'No output');
     } catch (error) {
-      setOutput("Error running code");
+      setOutput(`Error: ${error.message || 'Failed to execute code'}`);
     }
   };
   
 
   const handleGetFeedback = async () => {
     try {
-      // Sending request to your backend to get feedback from Gemini API
-      const response = await axios.post("/get-feedback", { code });
+      setFeedback("Analyzing code...");
+      const response = await axios.post("/get-feedback", { 
+        code,
+        language 
+      });
       setFeedback(response.data.feedback || "No feedback available");
     } catch (error) {
-      setFeedback("Error fetching feedback");
+      console.error("Error getting feedback:", error);
+      setFeedback(
+        "Error analyzing code. Please try again later."
+      );
     }
   };
 

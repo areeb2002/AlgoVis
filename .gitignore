@@ -30,3 +30,6 @@ yarn-error.log*
 
 #developer photo
 /Github/Developer/Image/
+
+# Temporary files
+**/temp/
